@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Happy Diwali</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Poppins:wght@400;600&display=swap">
+  <style>
+    :root {
+      --bg: #12041f;
+      --gold: #ffc83d;
+      --pink: #ff4fa3;
+      --text: #fff6e0;
+      --btn1: #ff8a00;
+      --btn2: #e52e71;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #12041f
+      }
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0
+    }
+
+    body {
+      background: radial-gradient(ellipse at 50% 100%, #3a0f4d 0%, var(--bg) 65%);
+      color: var(--text);
+      font-family: Poppins, system-ui, sans-serif;
+      overflow: hidden
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%
+    }
+
+    #mute {
+      position: fixed;
+      top: calc(12px + env(safe-area-inset-top, 0px));
+      right: 12px;
+      z-index: 9;
+      padding: 8px 14px;
+      font-size: 20px;
+      background: rgba(255, 255, 255, .14);
+      box-shadow: none
+    }
+
+    #intro {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      z-index: 5;
+      text-align: center;
+      padding: 20px;
+      transition: opacity .8s
+    }
+
+    #intro.hide {
+      opacity: 0;
+      pointer-events: none
+    }
+
+    .diya {
+      font-size: 64px;
+      animation: flick 1.4s infinite alternate
+    }
+
+    @keyframes flick {
+      from {
+        transform: scale(1);
+        filter: drop-shadow(0 0 8px #ffb300)
+      }
+
+      to {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 22px #ffb300)
+      }
+    }
+
+    #intro p {
+      margin: 0;
+      opacity: .85
+    }
+
+    button,
+    .pick {
+      font: 600 18px Poppins, sans-serif;
+      border: 0;
+      border-radius: 40px;
+      padding: 16px 38px;
+      color: #fff;
+      background: linear-gradient(90deg, var(--btn1), var(--btn2));
+      cursor: pointer;
+      box-shadow: 0 0 28px rgba(255, 138, 0, .55);
+      transition: transform .2s
+    }
+
+    button:hover {
+      transform: scale(1.06)
+    }
+
+    button:focus-visible,
+    .pick:focus-within {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px
+    }
+
+    .pick {
+      display: inline-block;
+      font-size: 14px;
+      padding: 10px 22px;
+      background: rgba(255, 255, 255, .12);
+      box-shadow: none
+    }
+
+    .pick input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px
+    }
+
+    #stage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      z-index: 4;
+      opacity: 0;
+      pointer-events: none;
+      padding: 16px
+    }
+
+    #stage.show {
+      opacity: 1
+    }
+
+    .frame {
+      position: relative;
+      width: min(62vw, 300px);
+      aspect-ratio: 1
+    }
+
+    .ring {
+      position: absolute;
+      inset: -14%;
+      border-radius: 50%;
+      background: conic-gradient(#ff3d6e, #ffc83d, #35e0a1, #3db2ff, #b46bff, #ff3d6e);
+      animation: spin 6s linear infinite;
+      filter: blur(2px)
+    }
+
+    .ring.r2 {
+      inset: -26%;
+      opacity: .45;
+      animation-duration: 10s;
+      animation-direction: reverse;
+      filter: blur(10px)
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .shape {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      opacity: .9;
+      animation: float 3s ease-in-out infinite alternate
+    }
+
+    @keyframes float {
+      from {
+        transform: translateY(-8px) rotate(0)
+      }
+
+      to {
+        transform: translateY(10px) rotate(40deg)
+      }
+    }
+
+    #photo {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: #2a0f3d center/cover no-repeat;
+      border: 5px solid var(--gold);
+      box-shadow: 0 0 40px rgba(255, 200, 61, .7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 70px;
+      transform: scale(0)
+    }
+
+    #stage.show #photo {
+      animation: pop 1s .2s cubic-bezier(.2, 1.4, .4, 1) forwards
+    }
+
+    @keyframes pop {
+      to {
+        transform: scale(1)
+      }
+    }
+
+    h1 {
+      margin: 0;
+      font: 400 clamp(38px, 11vw, 84px) 'Yatra One', Georgia, serif;
+      text-align: center;
+      line-height: 1.1;
+      background: linear-gradient(90deg, #ffd75e, #ff4fa3, #ffd75e, #7be0ff);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shine 4s linear infinite;
+      filter: drop-shadow(0 0 14px rgba(255, 180, 60, .6))
+    }
+
+    @keyframes shine {
+      to {
+        background-position: 300% 0
+      }
+    }
+
+    h1 span {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(40px) scale(.4)
+    }
+
+    #stage.show h1 span {
+      animation: letter .7s forwards cubic-bezier(.2, 1.5, .4, 1)
+    }
+
+    @keyframes letter {
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .sub {
+      margin: 0;
+      font-size: clamp(14px, 3.6vw, 20px);
+      opacity: 0;
+      text-align: center
+    }
+
+    #stage.show .sub {
+      animation: fade 1s 2s forwards
+    }
+
+    @keyframes fade {
+      to {
+        opacity: .9
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .ring,
+      h1 {
+        animation: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="fx"></canvas>
+  <button id="mute" type="button" aria-label="Mute or unmute sound">🔊</button>
+
+  <div id="intro">
+    <div class="diya">🪔</div>
+    <p>A little surprise for you</p>
+    <button id="go" type="button">Tap to wish</button>
+  </div>
+
+  <div id="stage">
+    <div class="frame">
+      <div class="ring r2"></div>
+      <div class="ring"></div>
+      <div id="photo" style="background-image:url('photo.jpg')"></div>
+    </div>
+    <h1 id="title" aria-label="Happy Diwali"></h1>
+    <p class="sub">Happy Diwali💕 ei 4 years toke wish kori ni but....
+      May your life glow with light, joy and sweetness ✨</p>
+  </div>
+
+  <script>
+    (function () {
+      var cv = document.getElementById('fx'), ctx = cv.getContext('2d'), W, H, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      function size() { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0) }
+      size(); addEventListener('resize', size);
+
+      var colors = ['#ff3d6e', '#ffc83d', '#35e0a1', '#3db2ff', '#b46bff', '#ff8a00', '#ffffff'];
+      var rockets = [], sparks = [], running = false, last = 0;
+
+      // ---- cracker sounds (synthesised, no audio files needed) ----
+      var AC = null, master = null, muted = false, noiseBuf = null;
+      function initAudio() {
+        if (AC) return;
+        try {
+          AC = new (window.AudioContext || window.webkitAudioContext)();
+          master = AC.createGain(); master.gain.value = .7; master.connect(AC.destination);
+          noiseBuf = AC.createBuffer(1, AC.sampleRate * 1.5, AC.sampleRate);
+          var d = noiseBuf.getChannelData(0); for (var i = 0; i < d.length; i++)d[i] = Math.random() * 2 - 1;
+        } catch (e) { AC = null }
+      }
+      function noise(t, dur, freq, q, vol, type) {
+        var s = AC.createBufferSource(); s.buffer = noiseBuf;
+        var f = AC.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+        var g = AC.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+        s.connect(f); f.connect(g); g.connect(master); s.start(t, Math.random() * .5, dur + .05);
+      }
+      function whistle() {
+        if (!AC || muted) return; var t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(500, t); o.frequency.exponentialRampToValueAtTime(1800, t + .7);
+        g.gain.setValueAtTime(.05, t); g.gain.exponentialRampToValueAtTime(.001, t + .7);
+        o.connect(g); g.connect(master); o.start(t); o.stop(t + .75);
+      }
+      function boom() {
+        if (!AC || muted) return; var t = AC.currentTime;
+        noise(t, .9, 260, .7, 1, 'lowpass');                       // deep thud
+        var o = AC.createOscillator(), g = AC.createGain();
+        o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(35, t + .4);
+        g.gain.setValueAtTime(.8, t); g.gain.exponentialRampToValueAtTime(.001, t + .5);
+        o.connect(g); g.connect(master); o.start(t); o.stop(t + .55);
+        for (var i = 0; i < 14; i++)noise(t + .12 + Math.random() * .9, .05, 3000 + Math.random() * 3000, 1, .22, 'highpass'); // crackle
+      }
+
+      function launch(x) {
+        whistle();
+        rockets.push({ x: x || W * (.15 + Math.random() * .7), y: H, ty: H * (.12 + Math.random() * .38), vy: -(9 + Math.random() * 3), c: colors[Math.random() * colors.length | 0] });
+      }
+      function burst(x, y, c) {
+        setTimeout(boom, 0);
+        var n = 70 + Math.random() * 50 | 0, two = Math.random() < .4, c2 = colors[Math.random() * colors.length | 0];
+        for (var i = 0; i < n; i++) {
+          var a = Math.PI * 2 * i / n, s = (1.5 + Math.random() * 3.8) * (Math.random() < .3 ? .6 : 1);
+          sparks.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 1, d: .008 + Math.random() * .01, c: two && i % 2 ? c2 : c, r: 1.4 + Math.random() * 1.6 });
+        }
+      }
+      function frame(t) {
+        if (!running) return;
+        var dt = Math.min((t - last) / 16.7 || 1, 3); last = t;
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = 'lighter';
+        for (var i = rockets.length - 1; i >= 0; i--) {
+          var r = rockets[i]; r.y += r.vy * dt; r.vy *= .985;
+          ctx.fillStyle = r.c; ctx.beginPath(); ctx.arc(r.x, r.y, 2.4, 0, 7); ctx.fill();
+          if (r.y <= r.ty || r.vy > -1.5) { burst(r.x, r.y, r.c); rockets.splice(i, 1) }
+        }
+        for (var j = sparks.length - 1; j >= 0; j--) {
+          var p = sparks[j]; p.x += p.vx * dt; p.y += p.vy * dt; p.vy += .05 * dt; p.vx *= .985; p.life -= p.d * dt;
+          if (p.life <= 0) { sparks.splice(j, 1); continue }
+          ctx.globalAlpha = p.life; ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        if (Math.random() < .05) launch();
+        requestAnimationFrame(frame);
+      }
+
+      // title letters
+      var title = document.getElementById('title'), txt = 'Happy Diwali';
+      txt.split('').forEach(function (ch, i) {
+        var s = document.createElement('span'); s.textContent = ch === ' ' ? '\u00A0' : ch;
+        s.style.animationDelay = (1 + i * .08) + 's'; title.appendChild(s);
+      });
+
+      // floating colourful shapes around the photo
+      var frameEl = document.querySelector('.frame'), shapeCols = ['#ff3d6e', '#ffc83d', '#35e0a1', '#3db2ff', '#b46bff', '#ff8a00'];
+      var kinds = ['50%', '0', '50% 0 50% 0', '0 50% 0 50%'];
+      for (var k = 0; k < 14; k++) {
+        var d = document.createElement('div'), a = Math.PI * 2 * k / 14, rad = 62 + (k % 2) * 10;
+        d.className = 'shape';
+        d.style.left = 'calc(50% + ' + (Math.cos(a) * rad) + '% - 13px)';
+        d.style.top = 'calc(50% + ' + (Math.sin(a) * rad) + '% - 13px)';
+        d.style.background = shapeCols[k % 6]; d.style.borderRadius = kinds[k % 4];
+        d.style.boxShadow = '0 0 14px ' + shapeCols[k % 6];
+        d.style.animationDelay = (k * .2) + 's';
+        if (k % 3 == 0) d.style.transform = 'rotate(45deg)';
+        frameEl.appendChild(d);
+      }
+
+      document.getElementById('go').addEventListener('click', function () {
+        initAudio(); if (AC && AC.state === 'suspended') AC.resume();
+        document.getElementById('intro').classList.add('hide');
+        document.getElementById('stage').classList.add('show');
+        running = true; last = performance.now(); requestAnimationFrame(frame);
+        for (var i = 0; i < 5; i++)setTimeout(launch, i * 300);
+      });
+      document.getElementById('mute').addEventListener('click', function () { muted = !muted; this.textContent = muted ? '🔇' : '🔊' });
+      cv.addEventListener('pointerdown', function (e) { if (running) launch(e.clientX) });
+    })();
+  </script>
+</body>
+
+</html>
